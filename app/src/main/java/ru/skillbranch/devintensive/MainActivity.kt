@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
@@ -15,7 +16,7 @@ import ru.skillbranch.devintensive.R
 import ru.skillbranch.devintensive.extensions.hideKeyboard
 import ru.skillbranch.devintensive.models.Bender
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class MainActivity : AppCompatActivity(), View.OnClickListener, TextView.OnEditorActionListener {
 
     lateinit var benderImage: ImageView
     lateinit var textTxt: TextView
@@ -99,5 +100,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
 
 
+    }
+
+    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+        TODO("Not yet implemented")
     }
 }
