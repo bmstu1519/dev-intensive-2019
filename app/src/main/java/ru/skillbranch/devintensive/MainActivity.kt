@@ -8,6 +8,7 @@ import android.os.PersistableBundle
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -49,6 +50,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, TextView.OnEdito
         textTxt.text = benderObj.askQuestion() //можно обратиться к параметру, не создавай геттеров и сеттеров(они сами создаются под капотом)
 
         sendBtn.setOnClickListener(this)
+        messageEt.setOnEditorActionListener(this)
 
     }
 
@@ -89,20 +91,35 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, TextView.OnEdito
         outState.putString("QUESTION", benderObj.question.name )
         Log.d("M_MainActivity","onSaveInstanceState ${benderObj.status.name} ${benderObj.question.name}")
     }
+
+    fun doWhenClick(){
+        val (phrase, color) = benderObj.listenAnswer(messageEt.text.toString())
+        messageEt.setText("")
+        val (r,g,b) = color
+        benderImage.setColorFilter(Color.rgb(r,g,b), PorterDuff.Mode.MULTIPLY)
+        textTxt.text = phrase
+    }
     override fun onClick(v: View?) {
         if(v?.id == R.id.iv_send){
-            this.hideKeyboard()
-            val (phrase, color) = benderObj.listenAnswer(messageEt.text.toString().toLowerCase())
-            messageEt.setText("")
-            val (r,g,b) = color
-            benderImage.setColorFilter(Color.rgb(r,g,b), PorterDuff.Mode.MULTIPLY)
-            textTxt.text = phrase
+            doWhenClick()
         }
-
-
+        this.hideKeyboard()
     }
 
+    /*
+    "Enter" на клавиатуре - это imeOptions (Specify the Input Method Action), существуют:
+    IME_ACTION_SEND (картинка письмо)
+    IME_ACTION_DONE (галочка)
+    IME_ACTION_SEARCH (лупа)
+    и т.д
+    нужно обозначать .IME_ACTION_*, в xml android:imeOptions="action*"
+    messageEt.setOnEditorActionListener(this) - обязательно вызвать
+     */
     override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
-        TODO("Not yet implemented")
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+            doWhenClick()
+        }
+        this.hideKeyboard()
+        return true
     }
 }

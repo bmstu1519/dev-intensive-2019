@@ -41,6 +41,7 @@
             android:id="@+id/et_message"
             android:layout_width="0dp"
             android:singleLine="true"
+            android:inputType="textImeMultiLine"
             android:imeOptions="actionDone"
             android:layout_height="wrap_content"
             android:layout_weight="1"
