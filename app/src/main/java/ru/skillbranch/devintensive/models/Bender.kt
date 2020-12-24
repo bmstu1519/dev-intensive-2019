@@ -1,120 +1,89 @@
 package ru.skillbranch.devintensive.models
 
-import androidx.core.text.isDigitsOnly
+/**
+ * @author iamserj
+ * 16.07.2019 22:34
+ */
 
-class Bender(var status: Status = Status.NORMAL, var question: Question = Question.NAME) {
+class Bender (var status: Status = Status.NORMAL, var question: Question = Question.NAME) {
 
-    fun askQuestion(): String = when(question){
+    fun askQuestion():String = question.question
 
-        Question.NAME -> Question.NAME.question
-        Question.PROFESSION -> Question.PROFESSION.question
-        Question.MATERIAL -> Question.MATERIAL.question
-        Question.BDAY -> Question.BDAY.question
-        Question.SERIAL -> Question.SERIAL.question
-        Question.IDLE -> Question.IDLE.question
+    fun listenAnswer(answer: String): Pair<String, Triple<Int, Int, Int>> {
+        return when(question) {
+            Question.IDLE -> question.question to status.color
+            else -> "${checkAnswer(answer)}\n${question.question}" to status.color
+        }
     }
-    fun listenAnswer(answer:String ) : Pair<String, Triple<Int, Int, Int>>{
 
-        return if(question == Question.IDLE) {
+    private fun checkAnswer(answer: String): String {
+        return if (question.answers.contains(answer)) {
             question = question.nextQuestion()
-            question.question to status.color
-        }else
-            when(question.answer.contains(answer)){
-                true -> {
-                    question = question.nextQuestion()
-                    "Отлично - ты справился\n" + question.question to status.color
-                }
-                false -> when(question.validateQuestion(answer).first){
-                            true -> question.validateQuestion(answer).second+"\n" +
-                                    question.question to status.color
-                            false -> if(this.status == Status.CRITICAL){
-                                status = Status.NORMAL
-                                question = Question.NAME
-                                "Это неправильный ответ. Давай все по новой" +
-                                        "\n${question.question}" to status.color
-                                } else{
-                                    status = status.nextStatus()
-                                    "Это неправильный ответ\n${question.question}" to status.color
-                                }
+            "Отлично - ты справился"
+        } else {
+            if (status == Status.CRITICAL) {
+                resetStates()
+                "Это неправильный ответ. Давай все по новой"
+            } else {
+                status = status.nextStatus()
+                "Это неправильный ответ"
             }
         }
     }
-    enum class Status(val color : Triple<Int,Int,Int>){
-        NORMAL(Triple(255, 255, 255)) ,
+
+    private fun resetStates() {
+        status = Status.NORMAL
+        question = Question.NAME
+    }
+
+    enum class Status(val color: Triple<Int, Int, Int>) {
+        NORMAL(Triple(255, 255, 255)),
         WARNING(Triple(255, 120, 0)),
         DANGER(Triple(255, 60, 60)),
-        CRITICAL(Triple(255, 0, 0)) ;
+        CRITICAL(Triple(255, 0, 0));
 
-        fun nextStatus(): Status{
-            return if (this.ordinal < values().lastIndex){
+        fun nextStatus():Status {
+            return if (this.ordinal < values().lastIndex) {
                 values()[this.ordinal + 1]
-            }else{
+            } else {
                 values()[0]
             }
         }
     }
 
-    enum class Question(val question: String, val answer: List<String>){
-        NAME("Как меня зовут?", listOf("Бендер","Bender")) {
 
-            override fun validateQuestion(userAnswer: String): Pair<Boolean,String> {
-                return when(answer.contains(userAnswer.capitalize())) {
-                    true -> Pair(true, "Имя должно начинаться с заглавной буквы")
-                    false -> Pair(false, "")
-                }
-            }
+    enum class Question(val question: String, val answers: List<String>) {
+        NAME("Как меня зовут?", listOf("бендер", "bender")) {
             override fun nextQuestion(): Question = PROFESSION
+            // firstOrNull() Returns the first character, or null if the char sequence is empty.
+            override fun validate(answer: String): Boolean = answer.trim().firstOrNull()?.isUpperCase() ?: false
         },
-        PROFESSION("Назови мою профессию?", listOf("сгибальщик","bender")){
-
-            override fun validateQuestion(userAnswer: String): Pair<Boolean,String> {
-                return when(answer.contains(userAnswer.toLowerCase())) {
-                    true -> Pair(true, "Профессия должна начинаться со строчной буквы")
-                    false -> Pair(false, "")
-                }
-            }
+        PROFESSION("Назови мою профессию?", listOf("сгибальщик", "bender")) {
             override fun nextQuestion(): Question = MATERIAL
+            override fun validate(answer: String): Boolean = answer.trim().firstOrNull()?.isLowerCase() ?: false
         },
-        MATERIAL("Из чего я сделан?", listOf("металл","дерево","metal","iron","wood")){
-
-            override fun validateQuestion(userAnswer: String): Pair<Boolean,String> {
-                return when(answer.contains(userAnswer.filter { it.isLetter() })) {
-                    true -> Pair(true, "Материал не должен содержать цифр")
-                    false -> Pair(false, "")
-                }
-            }
+        MATERIAL("Из чего я сделан?", listOf("металл", "дерево", "metal", "iron", "wood")) {
             override fun nextQuestion(): Question = BDAY
+            // \d Matches any digit character (0-9).
+            override fun validate(answer: String): Boolean = answer.trim().contains(Regex("\\d")).not()
         },
-        BDAY("Когда меня создали?", listOf("2993")){
-
-            override fun validateQuestion(userAnswer: String): Pair<Boolean,String> {
-                return when(answer.contains(userAnswer.filter { it.isDigit() })) {
-                    true -> Pair(true, "Год моего рождения должен содержать только цифры")
-                    false -> Pair(false, "")
-                }
-            }
+        BDAY("Когда меня создали?", listOf("2993")) {
             override fun nextQuestion(): Question = SERIAL
+            // ^ start of string; [0-9] match a single char in the list 0-9; * matches from 0 to unlimited times, as many times as possible; $ end of string
+            override fun validate(answer: String): Boolean = answer.trim().contains(Regex("^[0-9]*$"))
         },
-        SERIAL("Мой серийный номер?", listOf("2716057")){
-
-            override fun validateQuestion(userAnswer: String): Pair<Boolean,String> {
-                return when(!userAnswer.isDigitsOnly() || userAnswer.length != 7) {
-                    true -> Pair(true, "Серийный номер содержит только цифры, и их 7")
-                    false -> Pair(false, "")
-                }
-            }
+        SERIAL("Мой серийный номер?", listOf("2716057")) {
             override fun nextQuestion(): Question = IDLE
+            // [0-9]{7} match a single char in the list 0-9 * seven times
+            override fun validate(answer: String): Boolean = answer.trim().contains(Regex("^[0-9]{7}$"))
         },
-        IDLE("На этом все, вопросов больше нет", listOf()){
-
-            override fun validateQuestion(userAnswer: String): Pair<Boolean,String> {
-                return Pair(true, "")
-            }
-            override fun nextQuestion(): Question = NAME
-
+        IDLE("На этом все, вопросов больше нет", listOf()) {
+            override fun nextQuestion(): Question = IDLE
+            override fun validate(answer: String): Boolean = true
         };
 
-        abstract fun nextQuestion(): Question
-        abstract fun validateQuestion(userAnswer : String): Pair<Boolean, String>
+        abstract fun nextQuestion():Question
+        abstract fun validate(answer: String):Boolean
     }
+
 }
