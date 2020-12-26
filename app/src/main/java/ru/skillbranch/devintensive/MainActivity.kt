@@ -30,8 +30,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, TextView.OnEdito
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-
     //benderImage = findViewById(R.id.iv_bender) as ImageView
         benderImage = iv_bender // можно сразу ссылаться на id представления, без приведения типов
         textTxt = tv_text
@@ -52,6 +50,60 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, TextView.OnEdito
         sendBtn.setOnClickListener(this)
         messageEt.setOnEditorActionListener(this)
 
+    }
+    override fun onClick(v: View?) {
+        if(v?.id == R.id.iv_send) doWhenClick()
+        this.hideKeyboard()
+    }
+
+    private fun questionHintMessage() : String = when(benderObj.question){
+            Bender.Question.NAME -> "Имя должно начинаться с заглавной буквы"
+            Bender.Question.PROFESSION -> "Профессия должна начинаться со строчной буквы"
+            Bender.Question.MATERIAL -> "Материал не должен содержать цифр"
+            Bender.Question.BDAY -> "Год моего рождения должен содержать только цифры"
+            Bender.Question.SERIAL -> "Серийный номер содержит только цифры, и их 7"
+            Bender.Question.IDLE -> "На этом все, вопросов больше нет"
+        }
+
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putString("STATUS", benderObj.status.name)
+        outState.putString("QUESTION", benderObj.question.name )
+        Log.d("M_MainActivity","onSaveInstanceState ${benderObj.status.name} ${benderObj.question.name}")
+    }
+
+
+    private fun doWhenClick(){
+        if(benderObj.question.validateQuestion(messageEt.text.toString())) {
+            val (phrase, color) = benderObj.listenAnswer(messageEt.text.toString())
+            messageEt.setText("")
+            val (r, g, b) = color
+            benderImage.setColorFilter(Color.rgb(r, g, b), PorterDuff.Mode.MULTIPLY)
+            textTxt.text = phrase
+        } else {
+            textTxt.text = questionHintMessage() + "\n" + benderObj.question.question
+            messageEt.setText("")
+        }
+    }
+
+    /*
+    "Enter" на клавиатуре - это imeOptions (Specify the Input Method Action), существуют:
+    IME_ACTION_SEND (картинка письмо)
+    IME_ACTION_DONE (галочка)
+    IME_ACTION_SEARCH (лупа)
+    и т.д
+    нужно обозначать .IME_ACTION_*, в xml android:imeOptions="action*"
+    messageEt.setOnEditorActionListener(this) - обязательно вызвать
+     */
+    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+            doWhenClick()
+        }
+        this.hideKeyboard()
+        return true
     }
 
     override fun onRestart() {
@@ -84,42 +136,5 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, TextView.OnEdito
         Log.d("M_MainActivity","onDestroy")
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        outState.putString("STATUS", benderObj.status.name)
-        outState.putString("QUESTION", benderObj.question.name )
-        Log.d("M_MainActivity","onSaveInstanceState ${benderObj.status.name} ${benderObj.question.name}")
-    }
-
-    fun doWhenClick(){
-        val (phrase, color) = benderObj.listenAnswer(messageEt.text.toString())
-        messageEt.setText("")
-        val (r,g,b) = color
-        benderImage.setColorFilter(Color.rgb(r,g,b), PorterDuff.Mode.MULTIPLY)
-        textTxt.text = phrase
-    }
-    override fun onClick(v: View?) {
-        if(v?.id == R.id.iv_send){
-            doWhenClick()
-        }
-        this.hideKeyboard()
-    }
-
-    /*
-    "Enter" на клавиатуре - это imeOptions (Specify the Input Method Action), существуют:
-    IME_ACTION_SEND (картинка письмо)
-    IME_ACTION_DONE (галочка)
-    IME_ACTION_SEARCH (лупа)
-    и т.д
-    нужно обозначать .IME_ACTION_*, в xml android:imeOptions="action*"
-    messageEt.setOnEditorActionListener(this) - обязательно вызвать
-     */
-    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
-        if (actionId == EditorInfo.IME_ACTION_DONE) {
-            doWhenClick()
-        }
-        this.hideKeyboard()
-        return true
-    }
 }
+
