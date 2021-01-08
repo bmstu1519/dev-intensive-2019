@@ -1,8 +1,11 @@
 package ru.skillbranch.devintensive.utils
 
+import android.content.Context
+import android.util.TypedValue
+import ru.skillbranch.devintensive.R
+
 object Utils {
     fun parseFullName(fullName : String?) : Pair<String?, String?> {
-        //TODO FIX ME
         when(fullName){
             null, "", " " -> return null to null
         }
@@ -99,5 +102,10 @@ object Utils {
 
         }
     }
+    fun getThemeAccentColor(context: Context): Int {
+        val value = TypedValue()
+        context.theme.resolveAttribute(R.attr.colorAccent, value, true)
+        return value.data
     }
+}
 

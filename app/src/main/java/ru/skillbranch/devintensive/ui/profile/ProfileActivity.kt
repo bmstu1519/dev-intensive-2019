@@ -27,7 +27,6 @@ class ProfileActivity : AppCompatActivity() {
     lateinit var viewFields: Map<String, TextView>
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //TODO
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
         initViews(savedInstanceState)
@@ -72,13 +71,6 @@ class ProfileActivity : AppCompatActivity() {
 
         isEditMode = savedInstanceState?.getBoolean(IS_EDIT_MODE,false) ?: false
         showCurrentMode(isEditMode)
-        /*
-        btn_edit.setOnClickListener(object : View.OnClickListener{
-            override fun onClick(v: View?) {
-                isEditMode = !isEditMode
-                showCurrentMode(isEditMode)
-            }
-        })*/
 
         btn_edit.setOnClickListener(View.OnClickListener {
             if(isEditMode) saveProfileInfo()
