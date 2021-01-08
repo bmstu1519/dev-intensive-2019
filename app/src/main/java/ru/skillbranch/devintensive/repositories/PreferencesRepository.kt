@@ -18,7 +18,7 @@ object PreferencesRepository {
 
     private val prefs: SharedPreferences by lazy {
         val ctx = App.applicationContext()
-        PreferenceManager.getDefaultSharedPreferences(ctx)
+        androidx.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
     }
     fun saveAppTheme(theme: Int) {
     putValue(APP_THEME to theme)
