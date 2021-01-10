@@ -2,9 +2,12 @@ package ru.skillbranch.devintensive.utils
 
 import android.content.Context
 import android.util.TypedValue
+import android.widget.EditText
 import ru.skillbranch.devintensive.R
+import ru.skillbranch.devintensive.models.Profile
 
 object Utils {
+
     fun parseFullName(fullName : String?) : Pair<String?, String?> {
         when(fullName){
             null, "", " " -> return null to null

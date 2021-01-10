@@ -27,6 +27,7 @@ class ProfileActivity : AppCompatActivity() {
     lateinit var viewFields: Map<String, TextView>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
         initViews(savedInstanceState)
@@ -35,7 +36,6 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-//        super.onSaveInstanceState(outState, outPersistentState)
         super.onSaveInstanceState(outState)
         outState.putBoolean(IS_EDIT_MODE, isEditMode)
     }
