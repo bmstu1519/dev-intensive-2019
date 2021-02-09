@@ -14,6 +14,7 @@
 
     <style name="Profile.EditText.Single" parent="Profile.EditText">
         <item name="singleLine">true</item>
+        <item name="errorEnabled">true</item>
     </style>
 
     <style name="Profile.EditText.Multiline" parent="Profile.EditText">

@@ -4,16 +4,22 @@ import android.graphics.ColorFilter
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.activity_profile.*
+import kotlinx.android.synthetic.main.activity_profile.view.*
 import ru.skillbranch.devintensive.R
 import ru.skillbranch.devintensive.models.Profile
+import ru.skillbranch.devintensive.utils.Utils
 import ru.skillbranch.devintensive.viewmodels.ProfileViewModel
 
 class ProfileActivity : AppCompatActivity() {
@@ -32,6 +38,7 @@ class ProfileActivity : AppCompatActivity() {
         setContentView(R.layout.activity_profile)
         initViews(savedInstanceState)
         initViewModel()
+
         Log.d("M_ProfileViewModel","onCreate")
     }
 
@@ -73,9 +80,13 @@ class ProfileActivity : AppCompatActivity() {
         showCurrentMode(isEditMode)
 
         btn_edit.setOnClickListener(View.OnClickListener {
-            if(isEditMode) saveProfileInfo()
+            if(isEditMode) {
+                if (validateRepo(et_repository.text.toString()) == false) et_repository.text.clear()
+                saveProfileInfo()
+            }
             isEditMode = !isEditMode
             showCurrentMode(isEditMode)
+
         })
 
         btn_switch_theme.setOnClickListener {
@@ -95,6 +106,8 @@ class ProfileActivity : AppCompatActivity() {
 
         ic_eye.visibility = if (isEdit) View.GONE else View.VISIBLE
         wr_about.isCounterEnabled = isEdit
+        wr_repository.isErrorEnabled = isEdit
+        et_repository.addTextChangedListener(TextFieldValidation(et_repository))
 
         with(btn_edit){
             val filter : ColorFilter? = if (isEdit){
@@ -112,6 +125,8 @@ class ProfileActivity : AppCompatActivity() {
 
             background.colorFilter = filter
             setImageDrawable(icon)
+
+
         }
     }
 
@@ -126,9 +141,25 @@ class ProfileActivity : AppCompatActivity() {
             viewModel.saveProfileData(this)
         }
     }
+    fun validateRepo(inputRepo: String) : Boolean{
+        val domain = listOf("https://github.com/","https://www.github.com/","www.github.com/","github.com/")
+        return if (domain.contains(inputRepo.substring(0, inputRepo.lastIndexOf('/') + 1)) && inputRepo.substring(inputRepo.lastIndexOf('/')).matches(Regex("^/[a-z0-9_]{5,39}$")) || inputRepo == ""){
+            true
+        }
+        else {
+            wr_repository.error = "Невалидный адрес репозитория"
+            false
+        }
+    }
 
+    inner class TextFieldValidation(private val view: View) : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {}
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
 
+            when(view.id){
+                R.id.et_repository -> validateRepo(et_repository.text.toString())
+            }
+        }
+        }
 }
-
-
-

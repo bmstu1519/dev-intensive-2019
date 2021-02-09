@@ -2,6 +2,7 @@ package ru.skillbranch.devintensive.repositories
 
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import ru.skillbranch.devintensive.App
 import ru.skillbranch.devintensive.models.Profile
@@ -15,7 +16,7 @@ object PreferencesRepository {
     private const val TV_RESPECT = "RESPECT"
     private const val APP_THEME = "APP_THEME"
 
-
+    //lazy обозночает,что жанное своейство будет проинициализировано в момент первого обращения
     private val prefs: SharedPreferences by lazy {
         val ctx = App.applicationContext()
         androidx.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
@@ -36,6 +37,7 @@ object PreferencesRepository {
     )
 
     fun saveProfile(profile: Profile) {
+        Log.d("M_ProfileViewModel","saveProfile")
         with(profile){
 
             putValue(ET_FIRST_NAME to firstName)
