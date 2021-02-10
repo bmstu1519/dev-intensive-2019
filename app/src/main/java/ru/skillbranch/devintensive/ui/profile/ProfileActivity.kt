@@ -1,13 +1,16 @@
 package ru.skillbranch.devintensive.ui.profile
 
+import android.content.Context
 import android.graphics.ColorFilter
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
+import android.view.ContextMenu
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -19,6 +22,7 @@ import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.activity_profile.view.*
 import ru.skillbranch.devintensive.R
 import ru.skillbranch.devintensive.models.Profile
+import ru.skillbranch.devintensive.ui.custom.CircleImageView
 import ru.skillbranch.devintensive.utils.Utils
 import ru.skillbranch.devintensive.viewmodels.ProfileViewModel
 
@@ -60,13 +64,18 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun updateUI(profile : Profile) {
         profile.toMap().also {
-            for ((k,v) in viewFields) v.text = it[k].toString()
+            for ((k, v) in viewFields) v.text = it[k].toString()
         }
+        if (profile.initials != null){
+            iv_avatar.setImageBitmap(iv_avatar.drawDefaultAvatar(
+                    profile.initials)
+            )
+        } else iv_avatar.setImageResource(R.drawable.avatar_default)
     }
 
     private fun initViews(savedInstanceState: Bundle?) {
         viewFields = mapOf(
-                "nickName" to tv_nick_name,
+                "nickName" to tv_nick_name ,
                 "rank" to tv_rank,
                 "firstName" to et_first_name,
                 "lastName" to et_last_name,
@@ -82,6 +91,7 @@ class ProfileActivity : AppCompatActivity() {
         btn_edit.setOnClickListener(View.OnClickListener {
             if(isEditMode) {
                 if (validateRepo(et_repository.text.toString()) == false) et_repository.text.clear()
+
                 saveProfileInfo()
             }
             isEditMode = !isEditMode
@@ -125,8 +135,6 @@ class ProfileActivity : AppCompatActivity() {
 
             background.colorFilter = filter
             setImageDrawable(icon)
-
-
         }
     }
 

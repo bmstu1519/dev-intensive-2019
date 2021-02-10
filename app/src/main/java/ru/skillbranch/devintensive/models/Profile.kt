@@ -1,5 +1,6 @@
 package ru.skillbranch.devintensive.models
 
+import kotlinx.android.synthetic.main.activity_profile.*
 import ru.skillbranch.devintensive.utils.Utils
 
 data class Profile(
@@ -11,6 +12,7 @@ data class Profile(
         val rating : Int = 0,
         val respect : Int = 0
 ){
+    val initials = Utils.toInitials(firstName,lastName)
     private val nickName : String = Utils.transliteration(firstName+"_"+lastName)
     private val rank : String = "Junior Android Developer"
 

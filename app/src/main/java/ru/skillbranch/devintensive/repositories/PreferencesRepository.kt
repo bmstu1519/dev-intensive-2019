@@ -16,7 +16,7 @@ object PreferencesRepository {
     private const val TV_RESPECT = "RESPECT"
     private const val APP_THEME = "APP_THEME"
 
-    //lazy обозночает,что жанное своейство будет проинициализировано в момент первого обращения
+    //lazy обозночает,что жадное свойство будет проинициализировано в момент первого обращения
     private val prefs: SharedPreferences by lazy {
         val ctx = App.applicationContext()
         androidx.preference.PreferenceManager.getDefaultSharedPreferences(ctx)

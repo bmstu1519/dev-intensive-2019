@@ -4,18 +4,24 @@ import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.media.Image
 import android.util.AttributeSet
+import android.widget.EditText
+import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.annotation.Dimension
 import androidx.core.content.ContextCompat
+import kotlinx.android.synthetic.main.activity_profile.view.*
 import ru.skillbranch.devintensive.R
 import ru.skillbranch.devintensive.extensions.dp
 import ru.skillbranch.devintensive.extensions.toDp
+import ru.skillbranch.devintensive.models.Profile
+import ru.skillbranch.devintensive.utils.Utils
 import ru.skillbranch.devintensive.utils.Utils.getThemeAccentColor
 import kotlin.math.min
 
 
-class CircleImageView @JvmOverloads constructor(
+class CircleImageView @JvmOverloads constructor (
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0
@@ -51,6 +57,7 @@ class CircleImageView @JvmOverloads constructor(
 
         canvas.drawCircle(circleCenterWithBorder, circleCenterWithBorder, circleCenterWithBorder, paintBorder)
         canvas.drawCircle(circleCenterWithBorder, circleCenterWithBorder, circleCenter, paint)
+
     }
 
     fun getBorderWidth(): Int = borderWidth.toInt().toDp()
@@ -142,44 +149,4 @@ class CircleImageView @JvmOverloads constructor(
         }
     }
 
-    /*override fun onDraw(canvas: Canvas?) {
-        super.onDraw(canvas)
-
-        val drawable = drawable ?: return
-
-        if (width == 0 || height == 0) return
-
-        val b: Bitmap = (drawable as BitmapDrawable).bitmap
-        val bitmap = b.copy(Bitmap.Config.ARGB_8888, true)
-
-        val w = width
-        val h = height
-
-        val roundBitmap : Bitmap = getRoundedCroppedBitmap(bitmap,w)
-        canvas?.drawBitmap(roundBitmap, 0f,0f,null)
-    }
-    private fun getRoundedCroppedBitmap(bitmap: Bitmap, radius : Int ) : Bitmap{
-        val finalBitMap : Bitmap = if(bitmap.height != radius || bitmap.width != radius){
-            Bitmap.createScaledBitmap(bitmap,radius,radius, false)
-        } else bitmap
-        val outPut : Bitmap = Bitmap.createBitmap(finalBitMap.width,finalBitMap.height,
-        Bitmap.Config.ARGB_8888)
-        val canvas: Canvas = Canvas(outPut)
-
-        val paint: Paint = Paint()
-        val rect : Rect = Rect(0,0,finalBitMap.height,finalBitMap.width)
-
-        paint.isAntiAlias = true
-        paint.isFilterBitmap = true
-        paint.isDither = true
-        canvas.drawARGB(0,0,0,0)
-        paint.color = Color.parseColor("#BAB399")
-        canvas.drawCircle(finalBitMap.width/2 + 0.7f,
-                finalBitMap.height/2 + 0.7f,
-                finalBitMap.width/2 + 0.1f,
-                paint)
-        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-        canvas.drawBitmap(finalBitMap,rect,rect,paint)
-        return outPut
-    }*/
 }
